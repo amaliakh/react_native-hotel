@@ -44,12 +44,14 @@ const Article = ({
       }else setLoggedIn(null);
     })
 
-    AsyncStorage.getItem(`${loggedIn.email}${image}`).then((res)=>{
-      if(res === 'yes') {
-        setListed(true)
-        console.log(`${loggedIn.email}${image} ${res}`)
-      }else setListed(false);
-    })
+    if(!loggedIn){
+      AsyncStorage.getItem(`${loggedIn.email}${image}`).then((res)=>{
+        if(res === 'yes') {
+          setListed(true)
+          console.log(`${loggedIn.email}${image} ${res}`)
+        }else setListed(false);
+      })
+    }
   }, []);
 
   useEffect(() => {
@@ -59,13 +61,14 @@ const Article = ({
       }else setLoggedIn(null);
     })
 
-    AsyncStorage.getItem(`${loggedIn.email}${image}`).then((res)=>{
-      if(res === 'yes') {
-        setListed(true)
-      }else {
-        setListed(false);
-      }
-    })
+    if(loggedIn){
+      AsyncStorage.getItem(`${loggedIn.email}${image}`).then((res)=>{
+        if(res === 'yes') {
+          setListed(true)
+          console.log(`${loggedIn.email}${image} ${res}`)
+        }else setListed(false);
+      })
+    }
   }, [visible]);
 
   const HandleWish = useCallback(() => {

@@ -4,10 +4,10 @@ import { useNavigation } from "@react-navigation/core";
 
 import { useTheme, useTranslation } from "../hooks/";
 import * as regex from "../constants/regex";
-import { Block, Button, Input, Image, Text, Checkbox } from "../components/";
+import { Block, Button, Image, Input, Text } from "../components/";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import {Restart} from 'fiction-expo-restart';
+import { Restart } from "fiction-expo-restart";
 
 const isAndroid = Platform.OS === "android";
 
@@ -65,6 +65,8 @@ const RegisterL = () => {
         }else{
           alert("Login Gagal")
         }
+      }).catch(()=>{
+        alert('Login gagal');
       })
     }}, [isValid, registration]);
 

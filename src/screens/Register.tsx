@@ -55,6 +55,7 @@ const Register = () => {
   const getData = async (email) => {
     try {
       const jsonValue = await AsyncStorage.getItem(email)
+      // console.log(jsonValue == null)
       return jsonValue != null ? JSON.parse(jsonValue) : null;
     } catch(e) {
       // error reading value
@@ -65,7 +66,8 @@ const Register = () => {
       /** send/save registratin data */
 
       try{
-        if(!getData(registration.email)){
+        // console.log(getData(registration.email)==null)
+        if(getData(registration.email)){
           const jsonRegis = JSON.stringify(registration);
           AsyncStorage.setItem(registration.email, jsonRegis);
           alert("Pendaftaran Berhasil");

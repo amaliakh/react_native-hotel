@@ -1,5 +1,8 @@
+
+
 {
   "main": "node_modules/expo/AppEntry.js",
+  "token": "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",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

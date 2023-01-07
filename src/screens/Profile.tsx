@@ -45,8 +45,8 @@ const Profile = () => {
     (type: 'twitter' | 'dribbble') => {
       const url =
         type === 'twitter'
-          ? `https://twitter.com/${user?.social?.twitter}`
-          : `https://dribbble.com/${user?.social?.dribbble}`;
+          ? `https://twitter.com/`
+          : `https://dribbble.com/`;
 
       try {
         Linking.openURL(url);
