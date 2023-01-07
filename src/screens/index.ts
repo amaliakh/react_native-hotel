@@ -9,6 +9,7 @@ export {default as Notifications} from './Pro';
 export {default as NotificationsSettings} from './Pro';
 export {default as Privacy} from './Pro';
 export {default as Profile} from './Profile';
+export {default as ChangeProfile} from './ChangeProfile';
 export {default as Register} from './Register';
 export {default as RegisterL} from './RegisterL';
 export {default as Login} from './Pro';

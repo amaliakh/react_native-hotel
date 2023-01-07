@@ -12,6 +12,7 @@ import {
 import Screens from './Screens';
 import {Block, Text, Switch, Button, Image} from '../components';
 import {useData, useTheme, useTranslation} from '../hooks';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Drawer = createDrawerNavigator();
 
@@ -82,16 +83,29 @@ const DrawerContent = (
 
   const handleWebLink = useCallback((url) => Linking.openURL(url), []);
 
+
+  const [logUser, setLogUser] = useState(false);
+  useEffect(() => {
+    AsyncStorage.getItem('log').then((res)=>{
+      if(res) setLogUser(true)
+      else setLogUser(false)
+    })
+  }, []);
+
+
   // screen list for Drawer menu
-  const screens = [
-    {name: t('screens.home'), to: 'Home', icon: assets.home},
+  const screens = logUser ? [
+        {name: t('screens.home'), to: 'Home', icon: assets.home},
     // {name: t('screens.components'), to: 'Components', icon: assets.components},
     // {name: t('screens.articles'), to: 'Articles', icon: assets.document},
     // {name: t('screens.rental'), to: 'Pro', icon: assets.rental},
     {name: t('screens.profile'), to: 'Profile', icon: assets.profile},
     // {name: t('screens.settings'), to: 'Pro', icon: assets.settings},
-    {name: t('screens.register'), to: 'Register', icon: assets.register},
+    {name: t('screens.register'), to: 'ChangeProfile', icon: assets.register},
     // {name: t('screens.register'), to: 'RegisterL', icon: assets.register},
+  ] :
+  [
+    {name: t('screens.home'), to: 'Home', icon: assets.home},
   ];
 
   return (

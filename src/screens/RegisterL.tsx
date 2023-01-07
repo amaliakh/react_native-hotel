@@ -1,10 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Linking, Platform } from "react-native";
+import { Platform } from "react-native";
 import { useNavigation } from "@react-navigation/core";
 
-import { useData, useTheme, useTranslation } from "../hooks/";
+import { useTheme, useTranslation } from "../hooks/";
 import * as regex from "../constants/regex";
 import { Block, Button, Input, Image, Text, Checkbox } from "../components/";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+import {Restart} from 'fiction-expo-restart';
 
 const isAndroid = Platform.OS === "android";
 
@@ -19,7 +22,6 @@ interface IRegistrationValidation {
 }
 
 const RegisterL = () => {
-  const { isDark } = useData();
   const { t } = useTranslation();
   const navigation = useNavigation();
   const [isValid, setIsValid] = useState<IRegistrationValidation>({
@@ -39,12 +41,32 @@ const RegisterL = () => {
     [setRegistration]
   );
 
-  const handleSignUp = useCallback(() => {
-    if (!Object.values(isValid).includes(false)) {
-      /** send/save registratin data */
-      console.log("handleSignUp", registration);
+  const getData = async (email) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(email)
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      console.log(e)
     }
-  }, [isValid, registration]);
+  }
+  const handleSignIn = useCallback(() => {
+    if (!Object.values(isValid).includes(false)) {
+      getData(registration.email).then((data)=>{
+        if(registration.password === data.password){
+          const jsonData = JSON.stringify(data)
+          AsyncStorage.setItem('log', jsonData).then( res => {
+            alert("Login Berhasil");
+            // navigation.navigate("Home");
+            // NativeModules.DevSettings.reload();
+            // navigation.navigate("Home")
+            Restart()
+            }
+          )
+        }else{
+          alert("Login Gagal")
+        }
+      })
+    }}, [isValid, registration]);
 
   useEffect(() => {
     setIsValid((state) => ({
@@ -137,7 +159,7 @@ const RegisterL = () => {
                 />
               </Block>
               <Button
-                onPress={handleSignUp}
+                onPress={handleSignIn}
                 marginVertical={sizes.s}
                 marginHorizontal={sizes.sm}
                 gradient={gradients.primary}
@@ -145,6 +167,17 @@ const RegisterL = () => {
                 <Text bold white transform="uppercase">
                   {/*{t("common.signup")}*/}
                   SIGN IN
+                </Text>
+              </Button>
+              <Button
+                primary
+                outlined
+                shadow={!isAndroid}
+                marginVertical={sizes.s}
+                marginHorizontal={sizes.sm}
+                onPress={() => navigation.navigate('Register')}>
+                <Text bold primary transform="uppercase">
+                  {t('common.signup')}
                 </Text>
               </Button>
             </Block>

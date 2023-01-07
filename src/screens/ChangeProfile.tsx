@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/core";
 import { useData, useTheme, useTranslation } from "../hooks/";
 import * as regex from "../constants/regex";
 import { Block, Button, Input, Image, Text, Checkbox } from "../components/";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const isAndroid = Platform.OS === "android";
 
@@ -21,7 +22,7 @@ interface IRegistrationValidation {
   password: boolean;
 }
 
-const Register = () => {
+const ChangeProfile = () => {
   const { isDark } = useData();
   const { t } = useTranslation();
   const navigation = useNavigation();
@@ -39,6 +40,15 @@ const Register = () => {
   });
   const { assets, colors, gradients, sizes } = useTheme();
 
+  const [data, setData] = useState<IRegistration>(null);
+
+  useEffect(() => {
+    AsyncStorage.getItem('log').then((res)=>{
+      setRegistration(JSON.parse(res))
+    })
+  },[]);
+
+
   const handleChange = useCallback(
     (value) => {
       setRegistration((state) => ({ ...state, ...value }));
@@ -49,7 +59,12 @@ const Register = () => {
   const handleSignUp = useCallback(() => {
     if (!Object.values(isValid).includes(false)) {
       /** send/save registratin data */
-      console.log("handleSignUp", registration);
+      const regisJson = JSON.stringify(registration)
+      AsyncStorage.setItem(registration.email, regisJson);
+      AsyncStorage.setItem('log', regisJson);
+      alert("Profile berhasil diubah");
+      navigation.navigate("Home")
+    // console.log(data.name)
     }
   }, [isValid, registration]);
 
@@ -140,10 +155,11 @@ const Register = () => {
                 <Input
                   autoCapitalize="none"
                   marginBottom={sizes.m}
+                  value={registration.name}
                   // label={t('common.name')}
                   // placeholder={t('common.namePlaceholder')}
                   label={"Nama"}
-                  placeholder={"Masukkan nama lengkap anda"}
+                  // placeholder={"Masukkan nama lengkap anda"}
                   success={Boolean(registration.name && isValid.name)}
                   danger={Boolean(registration.name && !isValid.name)}
                   onChangeText={(value) => handleChange({ name: value })}
@@ -151,6 +167,8 @@ const Register = () => {
                 <Input
                   autoCapitalize="none"
                   marginBottom={sizes.m}
+                  disabled={true}
+                  value={registration.email}
                   label={t("common.email")}
                   keyboardType="email-address"
                   // placeholder={t('common.emailPlaceholder')}
@@ -160,7 +178,8 @@ const Register = () => {
                   onChangeText={(value) => handleChange({ email: value })}
                 />
                 <Input
-                  secureTextEntry
+                  // secureTextEntry
+                  value={registration.password}
                   autoCapitalize="none"
                   marginBottom={sizes.m}
                   label={t("common.password")}
@@ -172,11 +191,12 @@ const Register = () => {
                 />
                 <Input
                   autoCapitalize="none"
+                  value={registration.description}
                   marginBottom={sizes.m}
                   // label={t('common.name')}
                   // placeholder={t('common.namePlaceholder')}
                   label={"Deskripsi"}
-                  placeholder={"Masukkan nama lengkap anda"}
+                  placeholder={"Deskripsikan diri anda"}
                   success={Boolean(registration.description && isValid.description)}
                   danger={Boolean(registration.description && !isValid.description)}
                   onChangeText={(value) => handleChange({ description: value })}
@@ -202,4 +222,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default ChangeProfile;

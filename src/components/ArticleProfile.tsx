@@ -20,7 +20,7 @@ import { ScreenHeight } from "react-native-elements/dist/helpers";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useNavigation } from "@react-navigation/core";
 
-const Article = ({
+const ArticleProfile = ({
   description,
   image,
   category,
@@ -39,28 +39,51 @@ const Article = ({
   const [listed, setListed] = useState(false)
   useEffect(() => {
     AsyncStorage.getItem('log').then((res)=>{
+      const JSONres = JSON.parse(res)
+      if(JSONres) {
+        setLoggedIn(JSONres)
+        try{
+          AsyncStorage.getItem(`${JSONres.email}${image}`).then((ress)=>{
+            if(ress === 'yes' && JSONres.email) {
+              setListed(true)
+            }else {
+              setListed(false);
+            }
+          })
+        }catch (e){
+          setListed(false)
+        }
+      }else setLoggedIn(null);
+    })
+  }, []);
+
+  useEffect(() => {
+    AsyncStorage.getItem('log').then((res)=>{
       if(res) {
         setLoggedIn(JSON.parse(res))
       }else setLoggedIn(null);
     })
 
-    AsyncStorage.getItem(`${loggedIn.email}${timestamp}`).then((res)=>{
-      console.log(res)
+    AsyncStorage.getItem(`${loggedIn.email}${image}`).then((res)=>{
       if(res === 'yes') {
         setListed(true)
-      }else setListed(false);
+      }else {
+        setListed(false);
+      }
     })
-  }, []);
+  }, [visible]);
 
   const HandleWish = useCallback(() => {
     if(loggedIn){
       if(listed){
-        AsyncStorage.setItem(`${loggedIn.email}${timestamp}`, 'no')
-        setListed(false)
-        setVisible(false)
-        alert("Wishlist berhasil dihapus")
+        AsyncStorage.removeItem(`${loggedIn.email}${image}`).then((res)=>{
+          setListed(false)
+          setVisible(false)
+          alert("Wishlist berhasil dihapus")
+        })
+        AsyncStorage.setItem(`${loggedIn.email}${image}`, null)
       }else{
-        AsyncStorage.setItem(`${loggedIn.email}${timestamp}`, 'yes')
+        AsyncStorage.setItem(`${loggedIn.email}${image}`, 'yes')
         setListed(true)
         setVisible(false)
         alert("Wishlist berhasil ditambahkan")
@@ -75,7 +98,11 @@ const Article = ({
     setVisible(!visible);
   };
 
-  // render card for Newest & Fashion
+  if(listed === false){
+    return (
+      <></>
+    )
+  }
 
   return (
     <TouchableWithoutFeedback onPress={toggleBottomNavigationView}>
@@ -205,7 +232,7 @@ const Article = ({
   // render card for Popular
 };
 
-export default Article;
+export default ArticleProfile;
 
 const styles = StyleSheet.create({
   container: {

@@ -5,6 +5,7 @@ import {useNavigation} from '@react-navigation/core';
 import {useData, useTheme, useTranslation} from '../hooks/';
 import * as regex from '../constants/regex';
 import {Block, Button, Input, Image, Text, Checkbox} from '../components/';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const isAndroid = Platform.OS === 'android';
 
@@ -12,6 +13,7 @@ interface IRegistration {
   name: string;
   email: string;
   password: string;
+  description: string;
   agreed: boolean;
 }
 interface IRegistrationValidation {
@@ -19,6 +21,7 @@ interface IRegistrationValidation {
   email: boolean;
   password: boolean;
   agreed: boolean;
+  description:boolean;
 }
 
 const Register = () => {
@@ -30,12 +33,14 @@ const Register = () => {
     email: false,
     password: false,
     agreed: false,
+    description: true,
   });
   const [registration, setRegistration] = useState<IRegistration>({
     name: '',
     email: '',
     password: '',
     agreed: false,
+    description: true
   });
   const {assets, colors, gradients, sizes} = useTheme();
 
@@ -46,10 +51,31 @@ const Register = () => {
     [setRegistration],
   );
 
+
+  const getData = async (email) => {
+    try {
+      const jsonValue = await AsyncStorage.getItem(email)
+      return jsonValue != null ? JSON.parse(jsonValue) : null;
+    } catch(e) {
+      // error reading value
+    }
+  }
   const handleSignUp = useCallback(() => {
     if (!Object.values(isValid).includes(false)) {
       /** send/save registratin data */
-      console.log('handleSignUp', registration);
+
+      try{
+        if(!getData(registration.email)){
+          const jsonRegis = JSON.stringify(registration);
+          AsyncStorage.setItem(registration.email, jsonRegis);
+          alert("Pendaftaran Berhasil");
+          navigation.navigate('Login');
+        }else{
+          alert("Email telah digunakan")
+        }
+      }catch (e){
+        console.log(e);
+      }
     }
   }, [isValid, registration]);
 
@@ -184,7 +210,7 @@ const Register = () => {
                   // label={t('common.name')}
                   // placeholder={t('common.namePlaceholder')}
                   label={"Nama"}
-                  placeholder={"Masukkan nama lengkap anda"}
+                  placeholder={"Masukkan nama anda"}
                   success={Boolean(registration.name && isValid.name)}
                   danger={Boolean(registration.name && !isValid.name)}
                   onChangeText={(value) => handleChange({name: value})}
@@ -193,8 +219,8 @@ const Register = () => {
                   autoCapitalize="none"
                   marginBottom={sizes.m}
                   label={t('common.email')}
-                  keyboardType="email-address"
-                  // placeholder={t('common.emailPlaceholder')}
+                  // keyboardType="email-address"
+                  placeholder={t('common.emailPlaceholder')}
                   placeholder={"Masukkan email"}
                   success={Boolean(registration.email && isValid.email)}
                   danger={Boolean(registration.email && !isValid.email)}

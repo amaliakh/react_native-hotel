@@ -1,11 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {FlatList} from 'react-native';
+import {FlatList, StyleSheet, View} from 'react-native';
 
 import {useData, useTheme} from '../hooks/';
 import {IArticle, ICategory} from '../constants/types';
 import { Block, Button, Article, Text, Input } from "../components/";
 
+
+
 const Articles = () => {
+
   const data = useData();
   const [selected, setSelected] = useState<ICategory>();
   const [articles, setArticles] = useState<IArticle[]>([]);
@@ -18,6 +21,8 @@ const Articles = () => {
     setCategories(data?.categories);
     setSelected(data?.categories[0]);
   }, [data.articles, data.categories]);
+
+  const [location, setLocation] = useState(null);
 
   // update articles on category change
   useEffect(() => {
@@ -32,11 +37,37 @@ const Articles = () => {
     setArticles(newArticles);
   }, [data, selected, setArticles]);
 
+  useEffect(() => {
+    const newArticles = data?.articles?.filter(
+      (article) => (article?.location?.country === location)
+        ? article?.location?.country === location
+        : article?.location?.city === location,
+    );
+
+    if (!location) {
+      setArticles(data?.articles);
+      setCategories(data?.categories);
+      setSelected(data?.categories[0]);
+      const category = data?.categories?.find(
+        (category) => category?.id === selected?.id,
+      );
+
+      const newArticles = data?.articles?.filter(
+        (article) => article?.category?.id === category?.id,
+      );
+      setArticles(newArticles)
+
+    }
+    setArticles(newArticles);
+  }, [location]);
+
+
   return (
     <Block>
 
       <Block color={colors.card} flex={0} padding={sizes.padding}>
-        <Input search placeholder={"Cari tempat"} />
+        <Input search placeholder={"Cari tempat"}
+               onChangeText={(value)=> (value) ? setLocation(value) : setLocation("")} />
       </Block>
 
       {/* categories list */}
@@ -79,8 +110,14 @@ const Articles = () => {
         contentContainerStyle={{paddingBottom: sizes.l}}
         renderItem={({item}) => <Article {...item} />}
       />
+
+
     </Block>
   );
 };
 
 export default Articles;
+
+
+
+

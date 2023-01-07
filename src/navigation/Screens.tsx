@@ -1,7 +1,7 @@
 import React from 'react';
 import {createStackNavigator} from '@react-navigation/stack';
 
-import {Articles, Components, Home, Profile, Register, Pro, RegisterL} from '../screens';
+import { Articles, Components, Home, Profile, Register, Pro, RegisterL, ChangeProfile } from "../screens";
 import {useScreenOptions, useTranslation} from '../hooks';
 
 const Stack = createStackNavigator();
@@ -35,12 +35,18 @@ export default () => {
       <Stack.Screen
         name="Profile"
         component={Profile}
-        options={{headerShown: false}}
+        options={{headerShown: true}}
       />
 
       <Stack.Screen
         name="Register"
         component={Register}
+        options={{headerShown: false}}
+      />
+
+      <Stack.Screen
+        name="ChangeProfile"
+        component={ChangeProfile}
         options={{headerShown: false}}
       />
 
